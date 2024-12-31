@@ -26,3 +26,7 @@ logs/
 # misc
 .DS_Store
 .vercel 
+
+# Add to existing .gitignore
+.cursor.permissions
+.cursorrc 

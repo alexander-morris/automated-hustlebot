@@ -1,11 +1,11 @@
 import React from 'react';
-import './App.css';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Autonomous Development Project</h1>
+        <h1>Real Debug Test</h1>
+        <p>Actually watching logs now...</p>
       </header>
     </div>
   );

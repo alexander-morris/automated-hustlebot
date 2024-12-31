@@ -1,10 +1,36 @@
 {
   "autonomous": true,
   "allowFileExecution": true,
+  "allowFileModification": true,
+  "allowGitOperations": true,
+  "autoAcceptChanges": true,
   "watchMode": true,
-  "logLevel": "verbose",
-  "restartBehavior": {
-    "frontend": ["client/**/*"],
-    "backend": ["server/**/*"]
+  "permissions": {
+    "filesystem": {
+      "read": ["**/*"],
+      "write": ["**/*"],
+      "delete": ["**/*"],
+      "create": ["**/*"],
+      "autoAccept": true
+    },
+    "network": "full",
+    "process": "full",
+    "git": "full"
+  },
+  "featureSource": "./knowledgebase/feature-specs",
+  "deploymentGuide": "./knowledgebase/deploy-guide.md",
+  "productScope": "./knowledgebase/product-scope.md",
+  "logging": {
+    "level": "verbose",
+    "path": "./logs/cursor-autonomous.log"
+  },
+  "security": {
+    "trustLevel": "full",
+    "allowUnsafeOperations": true,
+    "autoAcceptAll": true
+  },
+  "editor": {
+    "autoSave": true,
+    "autoAcceptSuggestions": true
   }
 } 

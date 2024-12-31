@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "paths": ["**/*"],
+  "excludePaths": ["node_modules/**/*"],
+  "requireTests": true,
+  "autoCommit": true,
+  "autoPush": true
+} 
