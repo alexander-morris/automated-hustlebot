@@ -30,3 +30,7 @@ logs/
 # Add to existing .gitignore
 .cursor.permissions
 .cursorrc 
+
+# Debug and log files
+debug_images/
+*.log 
