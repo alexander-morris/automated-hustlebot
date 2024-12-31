@@ -1,18 +1,45 @@
-# Full-Stack Development Automation Project
+# HustleBot III
 
-This project demonstrates automated development workflows using Cursor/Claude, featuring a React frontend and Express backend with continuous testing and monitoring.
+An automated system for continuous operation with integrated click automation.
 
-## Project Structure 
-This is a monorepo with a frontend and backend.
+## Setup
 
-## How to use this repo
+1. Install Python dependencies:
+```bash
+pip3 install -r clickbot_v2/requirements.txt
+```
 
-1. Fill out the product scope in the knowledgebase/your-product-scope.md file.
-2. Run the composer.sh script to start the development process.
-3. The composer will create a new branch, make changes, and merge the changes into the main branch.
-4. The composer will also run the tests and monitor the changes.
-5. The composer will create a pull request and merge the changes into the main branch.
-6. The composer will also create a new release and deploy the changes to the production environment.
+## Usage
 
-This is a template for a monorepo with a react frontend and express backend, targetting deployments to vercel, but you can easily change the deployment target to any other platform. Just be sure to include it in your knowledgebase folder and tell composer to pay attention to it. 
+1. Start the automation system:
+```bash
+python3 start.py
+```
+
+This will:
+- Start the Cursor composer
+- Launch the ClickBot
+- Guide you through calibration (if needed)
+- Begin monitoring for accept buttons
+
+The system will show a small status window in the bottom-right corner while running. When your cursor enters the calibrated composer area, it will automatically click any accept buttons that appear.
+
+Press Ctrl+C to stop the automation system.
+
+## Components
+
+- `start.py`: Main entry point that coordinates the composer and click automation
+- `clickbot_v2/`: Directory containing the click automation system
+  - `calibrate.py`: Standalone calibration tool
+  - `clicker.py`: Standalone click automation script
+  - `config.json`: Configuration file storing calibrated positions
+  - `requirements.txt`: Python package dependencies
+
+## Development
+
+The repository is organized into several key areas:
+- `knowledgebase/`: Documentation and specifications
+- `process-instructions/`: Development and deployment guides
+- `server/`: Backend server implementation
+- `client/`: Frontend client implementation 
 
