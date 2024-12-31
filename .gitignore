@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# testing
+coverage/
+
+# production
+build/
+dist/
+
+# logs
+logs/
+*.log
+
+# environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# misc
+.DS_Store
+.vercel 
