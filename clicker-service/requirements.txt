@@ -1,7 +1,0 @@
-flask==2.0.1
-pyautogui==0.9.53
-mss==9.0.1
-numpy>=1.26.0
-setuptools>=68.0.0
-pyscreeze>=0.1.30
-Pillow>=10.1.0 
