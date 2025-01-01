@@ -1,0 +1,17 @@
+# Temporary directories
+temp/
+__pycache__/
+
+# Python cache files
+*.pyc
+*.pyo
+*.pyd
+
+# Log files
+*.log
+
+# Environment
+.env
+.venv/
+venv/
+ENV/ 

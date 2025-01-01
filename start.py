@@ -7,6 +7,7 @@ import os
 import signal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QPainter, QPen, QColor
 import pyautogui
 
 class AutomationController:
@@ -30,7 +31,7 @@ class AutomationController:
         print("Please follow the calibration steps:")
         
         # Wait for user to position cursor on accept button
-        input("\n1. Move cursor to the ACCEPT button position and press Enter...")
+        input("\n1. Move cursor to where the Accept button appears and press Enter...")
         accept_pos = pyautogui.position()
         print(f"✅ Accept button position saved: ({accept_pos.x}, {accept_pos.y})")
         
@@ -62,6 +63,12 @@ class AutomationController:
             self.status_window = StatusWindow()
         self.status_window.show()
         
+    def click_accept_button(self, config):
+        """Click the accept button position"""
+        pos = config['accept_button']
+        pyautogui.click(pos['x'], pos['y'])
+        print(f"🖱️  Clicked accept button at ({pos['x']}, {pos['y']})")
+        
     def start_monitoring(self):
         print("\n👀 Starting accept button monitoring...")
         self.show_status_window()
@@ -83,10 +90,8 @@ class AutomationController:
                 
                 if (top_left['x'] <= pos.x <= bottom_right['x'] and 
                     min(top_left['y'], bottom_right['y']) <= pos.y <= max(top_left['y'], bottom_right['y'])):
-                    # Click accept button
-                    accept_pos = config['accept_button']
-                    pyautogui.click(accept_pos['x'], accept_pos['y'])
-                    print(f"🖱️  Clicked accept button at ({accept_pos['x']}, {accept_pos['y']})")
+                    # Click the accept button
+                    self.click_accept_button(config)
                     time.sleep(0.5)  # Small delay to prevent rapid clicking
                     
                 self.app.processEvents()  # Keep the Qt event loop running
