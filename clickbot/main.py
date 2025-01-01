@@ -1,168 +1,190 @@
-import cv2
+import os
+import sys
+import time
+import signal
+import argparse
+from datetime import datetime
+import pyautogui
 import numpy as np
 from PIL import Image
-import os
-import logging
-import pyautogui
-import time
-from datetime import datetime
-import mss
-import argparse
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
-def find_cursor_monitor():
-    """Find the monitor containing the Cursor application."""
-    logging.info("Searching for monitor with Cursor application...")
-    
-    # Load reference image
-    ref_path = os.path.join("images", "cursor-screen-head.png")
-    reference_img = cv2.imread(ref_path)
-    if reference_img is None:
-        logging.error(f"Reference image not found at {ref_path}")
-        return None
-        
-    with mss.mss() as sct:
-        # Check each monitor
-        for i, monitor in enumerate(sct.monitors[1:], 1):
-            logging.info(f"Checking monitor {i}: {monitor['width']}x{monitor['height']} at ({monitor['left']}, {monitor['top']})")
-            
-            # Capture top portion of monitor
-            area = {
-                "left": monitor["left"],
-                "top": monitor["top"],
-                "width": monitor["width"],
-                "height": 50  # Only check top 50 pixels
-            }
-            
-            try:
-                # Capture and convert to numpy array
-                screenshot = sct.grab(area)
-                screen_img = np.array(screenshot)
-                screen_img = screen_img[:, :, :3]  # Remove alpha channel
-                
-                # Template matching
-                result = cv2.matchTemplate(screen_img, reference_img, cv2.TM_CCOEFF_NORMED)
-                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-                
-                logging.info(f"Monitor {i} match confidence: {max_val:.3f}")
-                
-                if max_val > 0.8:  # High confidence threshold
-                    logging.info(f"Found Cursor application on monitor {i}")
-                    return monitor
-                    
-            except Exception as e:
-                logging.warning(f"Error checking monitor {i}: {str(e)}")
-                continue
-    
-    logging.warning("Could not find Cursor application, falling back to primary monitor")
-    return sct.monitors[1]
+from image_matcher import ImageMatcher
+from logging_config import setup_logging, log_error_with_context, log_match_result, save_debug_image
 
 class ClickBot:
-    def __init__(self, dev_mode=False):
-        self.dev_mode = dev_mode
-        pyautogui.FAILSAFE = True
-        pyautogui.PAUSE = 0.1
+    def __init__(self, debug=False, interval=3.0, confidence_threshold=0.8):
+        # Initialize logging
+        self.logger = setup_logging('clickbot', debug)
+        self.debug = debug
+        self.interval = interval
+        self.confidence_threshold = confidence_threshold
+        self.running = False
+        self.last_click_time = 0
+        self.click_cooldown = 1.0  # Minimum time between clicks
         
-        # Load target image
-        target_path = os.path.join("images", "target.png")
-        target = Image.open(target_path)
-        target = target.convert('RGB')
-        target_np = np.array(target)
-        self.target_bgr = cv2.cvtColor(target_np, cv2.COLOR_RGB2BGR)
+        # Initialize image matcher
+        self.matcher = ImageMatcher()
         
-        # Find correct monitor
-        self.monitor = find_cursor_monitor()
-        if not self.monitor:
-            raise RuntimeError("Failed to find Cursor monitor")
+        # Set up signal handlers
+        signal.signal(signal.SIGINT, self.handle_interrupt)
+        signal.signal(signal.SIGTERM, self.handle_interrupt)
+        
+        self.logger.info(f"ClickBot initialized - Debug: {debug}, Interval: {interval}s, "
+                        f"Confidence Threshold: {confidence_threshold}")
+
+    def find_cursor_monitor(self):
+        """Find the monitor containing the Cursor application."""
+        try:
+            ref_image_path = os.path.join(os.path.dirname(__file__), 'images', 'cursor-screen-head.png')
+            if not os.path.exists(ref_image_path):
+                raise FileNotFoundError(f"Reference image not found: {ref_image_path}")
+
+            ref_image = Image.open(ref_image_path)
+            monitors = self.matcher.get_monitors()
             
-        logging.info(f"Using monitor: {self.monitor['width']}x{self.monitor['height']} at ({self.monitor['left']}, {self.monitor['top']})")
-        
-        # Create debug output directory
-        os.makedirs("debug_output", exist_ok=True)
-        
-        # Store target dimensions
-        self.target_h, self.target_w = self.target_bgr.shape[:2]
-        
-    def check_for_target(self):
-        """Check for target in the current screen."""
-        with mss.mss() as sct:
-            # Capture screen
-            screenshot = sct.grab(self.monitor)
-            screen_np = np.array(screenshot)
-            screen_bgr = screen_np[:, :, :3]  # Remove alpha channel
+            best_match = None
+            best_confidence = 0
             
-            # Perform template matching
-            result = cv2.matchTemplate(screen_bgr, self.target_bgr, cv2.TM_CCOEFF_NORMED)
-            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            for i, monitor in enumerate(monitors):
+                # Only capture top 50 pixels of each monitor
+                top_region = {
+                    'left': monitor['left'],
+                    'top': monitor['top'],
+                    'width': monitor['width'],
+                    'height': 50
+                }
+                
+                screen = self.matcher.capture_screen(top_region)
+                match = self.matcher.find_template(screen, ref_image)
+                
+                if match and match['confidence'] > best_confidence:
+                    best_confidence = match['confidence']
+                    best_match = {**monitor, 'match': match}
+                
+                if self.debug:
+                    self.logger.debug(f"Monitor {i} scan - Confidence: {match['confidence'] if match else 0:.4f}")
             
-            if max_val >= 0.8:  # High confidence match
-                x, y = max_loc
-                click_x = self.monitor['left'] + x + self.target_w // 2
-                click_y = self.monitor['top'] + y + self.target_h // 2
-                
-                logging.info(f"Found target with {max_val:.2%} confidence at ({click_x}, {click_y})")
-                
-                if self.dev_mode:
-                    response = input("Click target? [y/N] ")
-                    if response.lower() != 'y':
-                        return
-                
-                # Save current mouse position
-                original_x, original_y = pyautogui.position()
-                
-                try:
-                    # Move to target and click
-                    pyautogui.moveTo(click_x, click_y, duration=0.2)
-                    time.sleep(0.1)
-                    pyautogui.click()
-                    time.sleep(0.1)
-                    
-                    # Return to original position
-                    pyautogui.moveTo(original_x, original_y, duration=0.1)
-                    logging.info("Click executed successfully")
-                    
-                except Exception as e:
-                    logging.error(f"Error during click operation: {str(e)}")
+            if best_match and best_confidence > 0.7:
+                self.logger.info(f"Found Cursor monitor - Confidence: {best_confidence:.4f}")
+                return best_match
             
-            else:
-                logging.debug(f"No high confidence matches found (best: {max_val:.2%})")
-    
-    def run(self, check_interval=1.0):
-        """Run the click bot continuously."""
-        logging.info("Starting click bot...")
-        last_monitor_check = time.time()
+            raise RuntimeError("Could not find Cursor application window")
+            
+        except Exception as e:
+            log_error_with_context(self.logger, e, "Monitor detection failed")
+            return None
+
+    def process_matches(self, matches, screen):
+        """Process and validate matches, handling clicks if appropriate."""
+        try:
+            if not matches:
+                return
+
+            current_time = time.time()
+            for match in matches:
+                if match['confidence'] < self.confidence_threshold:
+                    if self.debug:
+                        log_match_result(self.logger, match, match['confidence'])
+                    continue
+
+                if current_time - self.last_click_time < self.click_cooldown:
+                    self.logger.debug("Click cooldown active")
+                    continue
+
+                self.logger.info(f"High confidence match found: {match['confidence']:.4f} "
+                               f"at ({match['x']}, {match['y']})")
+
+                if self.debug:
+                    # Save annotated image
+                    annotated = screen.copy()
+                    self.matcher.draw_match(annotated, match)
+                    save_debug_image(annotated, 'match', 'annotated_matches')
+                else:
+                    # Perform click
+                    pyautogui.click(match['x'], match['y'])
+                    self.last_click_time = current_time
+                    self.logger.info(f"Clicked at ({match['x']}, {match['y']})")
+
+        except Exception as e:
+            log_error_with_context(self.logger, e, "Match processing failed")
+
+    def run(self):
+        """Main bot loop with proper error handling and monitoring."""
+        self.running = True
+        self.logger.info("Starting ClickBot")
         
         try:
-            while True:
-                # Check if we need to update monitor selection (every 5 minutes)
-                current_time = time.time()
-                if current_time - last_monitor_check >= 300:  # 5 minutes
-                    self.monitor = find_cursor_monitor()
-                    last_monitor_check = current_time
-                
-                self.check_for_target()
-                time.sleep(check_interval)
-                
-        except KeyboardInterrupt:
-            logging.info("Click bot stopped by user")
+            monitor = self.find_cursor_monitor()
+            if not monitor:
+                raise RuntimeError("Failed to find Cursor monitor")
+
+            last_monitor_check = time.time()
+            monitor_check_interval = 300  # Check monitor every 5 minutes
+            
+            while self.running:
+                try:
+                    current_time = time.time()
+                    
+                    # Periodically recheck monitor
+                    if current_time - last_monitor_check > monitor_check_interval:
+                        monitor = self.find_cursor_monitor()
+                        if not monitor:
+                            raise RuntimeError("Lost Cursor monitor")
+                        last_monitor_check = current_time
+                    
+                    # Capture screen and find matches
+                    screen = self.matcher.capture_screen(monitor)
+                    matches = self.matcher.find_all_matches(screen)
+                    
+                    # Process any matches found
+                    self.process_matches(matches, screen)
+                    
+                    # Status update every 30 seconds
+                    if int(current_time) % 30 == 0:
+                        self.logger.info("Bot running - monitoring for matches")
+                    
+                    time.sleep(self.interval)
+                    
+                except Exception as e:
+                    log_error_with_context(self.logger, e, "Error in main loop")
+                    time.sleep(self.interval)  # Continue with next iteration
+                    
         except Exception as e:
-            logging.error(f"Click bot error: {str(e)}")
+            log_error_with_context(self.logger, e, "Fatal error")
+            self.stop()
+            sys.exit(1)
+
+    def stop(self):
+        """Clean shutdown of the bot."""
+        self.logger.info("Stopping ClickBot")
+        self.running = False
+
+    def handle_interrupt(self, signum, frame):
+        """Handle interrupt signals gracefully."""
+        self.logger.info(f"Received signal {signum}")
+        self.stop()
 
 def main():
-    parser = argparse.ArgumentParser(description="Cursor Click Bot")
-    parser.add_argument("--dev", action="store_true", help="Run in development mode (requires click confirmation)")
+    parser = argparse.ArgumentParser(description='ClickBot - Automated UI interaction')
+    parser.add_argument('--debug', action='store_true', help='Enable debug mode')
+    parser.add_argument('--interval', type=float, default=3.0,
+                       help='Scan interval in seconds (default: 3.0)')
+    parser.add_argument('--confidence', type=float, default=0.8,
+                       help='Minimum confidence threshold (default: 0.8)')
     args = parser.parse_args()
+
+    bot = ClickBot(
+        debug=args.debug,
+        interval=args.interval,
+        confidence_threshold=args.confidence
+    )
     
     try:
-        bot = ClickBot(dev_mode=args.dev)
         bot.run()
-    except Exception as e:
-        logging.error(f"Failed to start click bot: {str(e)}")
+    except KeyboardInterrupt:
+        bot.logger.info("Keyboard interrupt received")
+    finally:
+        bot.stop()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main() 
