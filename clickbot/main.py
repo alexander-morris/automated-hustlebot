@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 
 from image_matcher import ImageMatcher
+from error_recovery import ErrorRecoveryHandler
 from logging_config import setup_logging, log_error_with_context, log_match_result, save_debug_image
 
 class ClickBot:
@@ -22,8 +23,9 @@ class ClickBot:
         self.last_click_time = 0
         self.click_cooldown = 1.0  # Minimum time between clicks
         
-        # Initialize image matcher
-        self.matcher = ImageMatcher()
+        # Initialize components
+        self.matcher = ImageMatcher(debug)
+        self.error_handler = ErrorRecoveryHandler(debug)
         
         # Set up signal handlers
         signal.signal(signal.SIGINT, self.handle_interrupt)
@@ -108,6 +110,19 @@ class ClickBot:
         except Exception as e:
             log_error_with_context(self.logger, e, "Match processing failed")
 
+    def handle_error_state(self, screen):
+        """Handle potential error states and perform recovery if needed."""
+        try:
+            if self.error_handler.handle_error_case(screen):
+                self.logger.info("Error state handled successfully")
+                return True
+            else:
+                self.logger.error("Failed to handle error state")
+                return False
+        except Exception as e:
+            log_error_with_context(self.logger, e, "Error handling failed")
+            return False
+
     def run(self):
         """Main bot loop with proper error handling and monitoring."""
         self.running = True
@@ -132,11 +147,17 @@ class ClickBot:
                             raise RuntimeError("Lost Cursor monitor")
                         last_monitor_check = current_time
                     
-                    # Capture screen and find matches
+                    # Capture screen and check for errors first
                     screen = self.matcher.capture_screen(monitor)
-                    matches = self.matcher.find_all_matches(screen)
                     
-                    # Process any matches found
+                    # Handle any error states before proceeding
+                    if not self.handle_error_state(screen):
+                        self.logger.warning("Error state detected but recovery failed")
+                        time.sleep(self.interval)
+                        continue
+                    
+                    # Proceed with normal operation
+                    matches = self.matcher.find_all_matches(screen)
                     self.process_matches(matches, screen)
                     
                     # Status update every 30 seconds

@@ -1,1 +1,103 @@
- 
+{
+  "autonomousMode": {
+    "enabled": true,
+    "autoAcceptChanges": true,
+    "continuousOperation": true
+  },
+
+  "processFlow": {
+    "featureImplementation": {
+      "order": [
+        "readKnowledgeBase",
+        "createTests",
+        "implementFeature",
+        "runTests",
+        "fixErrors",
+        "commitChanges"
+      ],
+      "maxRetries": 3,
+      "errorRecovery": true
+    },
+    "errorHandling": {
+      "singleErrorFocus": true,
+      "autoRetry": true,
+      "maxRetriesPerError": 3,
+      "errorPriorities": [
+        "security",
+        "dataIntegrity",
+        "userFacing",
+        "performance",
+        "style"
+      ]
+    }
+  },
+
+  "gitWorkflow": {
+    "branchNaming": {
+      "feature": "feature/{feature-number}-{feature-name}",
+      "debug": "debug/{feature-number}-{bug-description}",
+      "docs": "docs/{topic}"
+    },
+    "commitMessageFormat": "[type]([scope]): [description]",
+    "types": ["feat", "fix", "docs", "style", "refactor", "test", "chore"],
+    "autoCommit": true,
+    "autoPush": true
+  },
+
+  "testing": {
+    "preSave": {
+      "runUnitTests": true,
+      "checkLinting": true,
+      "typeCheck": true
+    },
+    "preRestart": {
+      "runFullTestSuite": true,
+      "checkConsoleErrors": true,
+      "verifyEndpoints": true
+    }
+  },
+
+  "logging": {
+    "levels": {
+      "error": true,
+      "warning": true,
+      "info": true,
+      "debug": true
+    },
+    "required": {
+      "timestamp": true,
+      "processId": true,
+      "stackTraces": true,
+      "coordinates": true,
+      "matchResults": true
+    },
+    "rotation": {
+      "enabled": true,
+      "maxSize": "10MB",
+      "backupCount": 5
+    }
+  },
+
+  "monitoring": {
+    "statusInterval": 30,
+    "checkpoints": {
+      "monitorDetection": 300,
+      "featureProgress": 600,
+      "errorResolution": 60
+    }
+  },
+
+  "paths": {
+    "knowledgeBase": "knowledgebase/",
+    "processInstructions": "process-instructions/",
+    "features": "knowledgebase/features/",
+    "logs": "logs/",
+    "debug": "debug_output/"
+  },
+
+  "timeouts": {
+    "windowDetection": 10,
+    "buttonDetection": 5,
+    "overallProcess": 300
+  }
+} 
