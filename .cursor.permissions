@@ -1,0 +1,19 @@
+{
+  "allowAll": true,
+  "trustedPaths": [
+    "knowledgebase/**/*",
+    "client/**/*",
+    "server/**/*",
+    "scripts/**/*",
+    "logs/**/*"
+  ],
+  "allowedOperations": [
+    "fileRead",
+    "fileWrite",
+    "fileDelete",
+    "processSpawn",
+    "gitOperations",
+    "networkAccess"
+  ],
+  "autoAcceptChanges": true
+} 

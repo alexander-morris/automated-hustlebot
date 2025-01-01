@@ -1,0 +1,526 @@
+2024-12-31 08:44:47,452 - INFO - Successfully imported ButtonFinder
+2024-12-31 08:44:47,452 - INFO - Checking screen recording permissions...
+2024-12-31 08:44:47,709 - INFO - Screen recording permission granted
+2024-12-31 08:44:47,709 - INFO - CursorWatcher initialized successfully
+2024-12-31 08:44:47,709 - INFO - Starting Cursor window search with elevated permissions...
+2024-12-31 08:44:47,710 - INFO - Available monitors:
+2024-12-31 08:44:47,712 - INFO - Monitor 0: -806x-1080 3840x2249
+2024-12-31 08:44:47,712 - INFO - Monitor 1: 0x0 1800x1169
+2024-12-31 08:44:47,712 - INFO - Monitor 2: -806x-1080 1920x1080
+2024-12-31 08:44:47,712 - INFO - Monitor 3: 1114x-1080 1920x1080
+2024-12-31 08:44:47,712 - INFO - Using Quartz accessibility API
+2024-12-31 08:44:47,712 - INFO - Primary monitor dimensions: 3840x2249
+2024-12-31 08:44:47,716 - INFO - Found potential Cursor window: {
+    Height = 1080;
+    Width = 1920;
+    X = "-806";
+    Y = "-1080";
+}
+2024-12-31 08:44:47,716 - INFO - Window appears to be on monitor 0
+2024-12-31 08:44:47,716 - INFO - Selected main Cursor window: {
+    Height = 1080;
+    Width = 1920;
+    X = "-806";
+    Y = "-1080";
+}
+2024-12-31 08:44:47,716 - INFO - Adjusted negative X coordinate to: 3034
+2024-12-31 08:44:47,716 - INFO - Adjusted negative Y coordinate to: 1169
+2024-12-31 08:44:47,716 - INFO - Final window region: {'top': 1169, 'left': 1920, 'width': 1920, 'height': 1080}
+2024-12-31 08:44:47,716 - INFO - Taking screenshot with mss
+2024-12-31 08:44:47,762 - INFO - Converted BGRA to RGB
+2024-12-31 08:44:47,762 - INFO - Screenshot shape: (1080, 1920, 3)
+2024-12-31 08:44:47,762 - INFO - Analyzing bottom section of window: shape=(400, 1920, 3)
+2024-12-31 08:44:47,762 - INFO - Sample color at (960, 200): RGB=[0 0 0]
+2024-12-31 08:44:47,762 - INFO - Sample color at (960, 380): RGB=[0 0 0]
+2024-12-31 08:44:47,762 - INFO - Sample color at (20, 380): RGB=[0 0 0]
+2024-12-31 08:44:47,762 - INFO - Sample color at (1900, 380): RGB=[0 0 0]
+2024-12-31 08:44:47,766 - INFO - Found 0 dark colored pixels
+2024-12-31 08:44:47,769 - INFO - Found 0 light colored pixels
+2024-12-31 08:44:47,769 - INFO - Using default bottom area as composer region: {'top': 2149, 'left': 1920, 'width': 1920, 'height': 100}
+2024-12-31 08:44:47,770 - INFO - Still watching... (0s elapsed)
+2024-12-31 08:44:47,770 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:47,771 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:48,276 - INFO - Still watching... (0s elapsed)
+2024-12-31 08:44:48,277 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:48,277 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:48,782 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:48,783 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:49,289 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:49,289 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:49,795 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:49,797 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:50,300 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:50,301 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:50,807 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:50,808 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:51,315 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:51,316 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:51,822 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:51,823 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:52,329 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:52,329 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:52,837 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:52,838 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:53,346 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:53,347 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:53,853 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:53,854 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:54,360 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:54,361 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:54,866 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:54,867 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:55,374 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:55,375 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:55,881 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:55,882 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:56,387 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:56,388 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:56,893 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:56,894 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:57,399 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:57,400 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:57,906 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:57,906 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:58,411 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:58,413 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:58,917 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:58,918 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:59,423 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:59,424 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:44:59,928 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:44:59,929 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:00,435 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:00,436 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:00,942 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:00,943 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:01,448 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:01,449 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:01,952 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:01,953 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:02,460 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:02,461 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:02,964 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:02,965 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:03,471 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:03,473 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:03,979 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:03,980 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:04,486 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:04,487 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:04,993 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:04,994 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:05,498 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:05,500 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:06,006 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:06,007 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:06,510 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:06,511 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:07,016 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:07,017 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:07,523 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:07,524 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:08,029 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:08,030 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:08,532 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:08,533 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:09,039 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:09,040 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:09,541 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:09,542 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:10,047 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:10,048 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:10,550 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:10,551 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:11,059 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:11,060 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:11,566 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:11,568 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:12,072 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:12,073 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:12,580 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:12,581 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:13,086 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:13,086 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:13,591 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:13,597 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:14,099 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:14,099 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:14,606 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:14,607 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:15,114 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:15,116 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:15,619 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:15,620 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:16,127 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:16,128 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:16,634 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:16,635 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:17,141 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:17,142 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:17,647 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:17,647 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:18,151 - INFO - Still watching... (30s elapsed)
+2024-12-31 08:45:18,153 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:18,154 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:18,659 - INFO - Still watching... (30s elapsed)
+2024-12-31 08:45:18,660 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:18,661 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:19,163 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:19,163 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:19,670 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:19,671 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:20,173 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:20,174 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:20,677 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:20,678 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:21,184 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:21,185 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:21,689 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:21,690 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+
+2024-12-31 08:45:22,195 - ERROR - Error finding cancel button: 'ButtonFinder' object has no attribute 'composer_region'
+2024-12-31 08:45:22,196 - ERROR - Traceback (most recent call last):
+  File "/Users/almorris/hustlebot_iii/clicker-service/button_finder.py", line 38, in click_button
+    screen = sct.grab(self.composer_region)
+                      ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ButtonFinder' object has no attribute 'composer_region'
+

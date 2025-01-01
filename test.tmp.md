@@ -1,22 +1,34 @@
-# ClickBot Testing Instructions
+# Test Content
 
-1. Open Cursor UI where the target button appears
-2. Make sure the target button is visible on screen
-3. The bot should automatically:
-   - Detect the button with high confidence (>0.9)
-   - Verify structural similarity (>0.8)
-   - Click the button if all criteria are met
+This is a temporary test file for the click bot project.
 
-## Monitoring
-- Check logs in `clickbot_v4/temp/logs/clickbot.log`
-- Bot runs every 1 second, with 2-second cooldown between clicks
-- Move mouse to screen corner to abort (failsafe)
+## Random Content
+- Lorem ipsum dolor sit amet
+- Consectetur adipiscing elit
+- Sed do eiusmod tempor incididunt
 
-## Current Status
-- Bot is running and monitoring screen
-- Target image size: 46x106 pixels
-- Using optimized image matching with text feature analysis
-- CPU usage has been optimized with proper delays
+### Code Sample
+```python
+def test_function():
+    print("Hello World!")
+    return True
+```
 
-## Special Thanks
-Huge thanks to Al Morris, a brilliant engineer and all-around great guy who made this project possible. His innovative approach to problem-solving and dedication to optimizing user experience have been instrumental in creating this robust solution. 
+## Notes
+1. First test note
+2. Second test note
+3. Third test note
+
+> This is a blockquote for testing purposes.
+
+*Random italic text*
+**Random bold text**
+~~Strikethrough text~~
+
+- [ ] Unchecked task
+- [x] Checked task
+
+| Column 1 | Column 2 |
+|----------|----------|
+| Test 1   | Value 1  |
+| Test 2   | Value 2  | 

@@ -1,219 +1,168 @@
+import cv2
+import numpy as np
+from PIL import Image
 import os
-import time
 import logging
 import pyautogui
-import mss
-import mss.tools
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+import time
 from datetime import datetime
-from image_matcher import ImageMatcher
-from typing import Tuple
-import math
-import cv2
+import mss
+import argparse
 
-class ClickBot:
-    def __init__(self, threshold=0.7):
-        self.matcher = ImageMatcher(threshold=threshold)
-        self.last_click_time = 0
-        self.click_cooldown = 2.0  # Seconds between clicks
-        self.original_mouse_pos = (0, 0)
-        self.move_duration = 0.1  # Fast but not instant movement
-        self.debug_dir = os.path.join(os.path.dirname(__file__), "debug_output")
-        os.makedirs(self.debug_dir, exist_ok=True)
-        
-        # Initialize screen capture
-        self.sct = mss.mss()
-        
-        # Configure pyautogui
-        pyautogui.FAILSAFE = True  # Move mouse to corner to abort
-        pyautogui.PAUSE = 0.1  # Small delay between actions
-        
-    def save_debug_image(self, screen_img, matches, timestamp):
-        """Save debug image with matches highlighted."""
-        # Convert to PIL Image if numpy array
-        if isinstance(screen_img, np.ndarray):
-            screen_img = cv2.cvtColor(screen_img, cv2.COLOR_BGR2RGB)
-            debug_img = Image.fromarray(screen_img)
-        else:
-            debug_img = screen_img
-            
-        draw = ImageDraw.Draw(debug_img)
-        
-        # Draw matches
-        for idx, match in enumerate(matches):
-            # Draw red dot
-            dot_radius = 5
-            draw.ellipse(
-                [
-                    match.center_x - dot_radius,
-                    match.center_y - dot_radius,
-                    match.center_x + dot_radius,
-                    match.center_y + dot_radius
-                ],
-                fill='red'
-            )
-            
-            # Draw confidence text
-            text = f"#{idx+1} Conf: {match.confidence:.2f}"
-            draw.text(
-                (match.center_x, match.center_y - 20),
-                text,
-                fill='red',
-                stroke_width=2,
-                stroke_fill='black'
-            )
-            
-            # Draw SSIM score
-            ssim_text = f"SSIM: {match.quality.structural_similarity:.2f}"
-            draw.text(
-                (match.center_x, match.center_y + 20),
-                ssim_text,
-                fill='red',
-                stroke_width=2,
-                stroke_fill='black'
-            )
-        
-        # Save debug image
-        filename = f"screen_matches_{timestamp}.png"
-        debug_path = os.path.join(self.debug_dir, filename)
-        debug_img.save(debug_path)
-        logging.info(f"Saved debug image: {filename}")
-        
-    def capture_screen(self):
-        """Capture the entire screen."""
-        # Capture all monitors
-        for monitor in self.sct.monitors[1:]:  # Skip first monitor (combined view)
-            try:
-                # Capture monitor
-                screenshot = self.sct.grab(monitor)
-                
-                # Convert to numpy array
-                img_array = np.array(screenshot)
-                
-                # Convert BGRA to RGB
-                img_array = img_array[:, :, [2,1,0]]
-                
-                return img_array
-                
-            except Exception as e:
-                logging.error(f"Error capturing monitor: {str(e)}")
-                continue
-                
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+def find_cursor_monitor():
+    """Find the monitor containing the Cursor application."""
+    logging.info("Searching for monitor with Cursor application...")
+    
+    # Load reference image
+    ref_path = os.path.join("images", "cursor-screen-head.png")
+    reference_img = cv2.imread(ref_path)
+    if reference_img is None:
+        logging.error(f"Reference image not found at {ref_path}")
         return None
         
-    def save_mouse_position(self):
-        """Save current mouse position."""
-        self.original_mouse_pos = pyautogui.position()
-        
-    def restore_mouse_position(self):
-        """Restore mouse to original position."""
-        pyautogui.moveTo(
-            self.original_mouse_pos[0],
-            self.original_mouse_pos[1],
-            duration=self.move_duration/2  # Faster return movement
-        )
-        
-    def smooth_click(self, x: int, y: int) -> bool:
-        """Perform a smooth click operation with position restore."""
-        try:
-            # Check cooldown
-            current_time = time.time()
-            if current_time - self.last_click_time < self.click_cooldown:
-                return False
-                
-            # Save current mouse position
-            self.save_mouse_position()
+    with mss.mss() as sct:
+        # Check each monitor
+        for i, monitor in enumerate(sct.monitors[1:], 1):
+            logging.info(f"Checking monitor {i}: {monitor['width']}x{monitor['height']} at ({monitor['left']}, {monitor['top']})")
             
-            # Move to target smoothly
-            pyautogui.moveTo(x, y, duration=self.move_duration)
+            # Capture top portion of monitor
+            area = {
+                "left": monitor["left"],
+                "top": monitor["top"],
+                "width": monitor["width"],
+                "height": 50  # Only check top 50 pixels
+            }
             
-            # Click and small pause
-            pyautogui.click()
-            time.sleep(0.1)
-            
-            # Restore position
-            self.restore_mouse_position()
-            
-            # Update last click time
-            self.last_click_time = current_time
-            return True
-            
-        except Exception as e:
-            logging.error(f"Error during click operation: {str(e)}")
-            # Try to restore mouse position even if click failed
             try:
-                self.restore_mouse_position()
-            except:
-                pass
-            return False
+                # Capture and convert to numpy array
+                screenshot = sct.grab(area)
+                screen_img = np.array(screenshot)
+                screen_img = screen_img[:, :, :3]  # Remove alpha channel
+                
+                # Template matching
+                result = cv2.matchTemplate(screen_img, reference_img, cv2.TM_CCOEFF_NORMED)
+                min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+                
+                logging.info(f"Monitor {i} match confidence: {max_val:.3f}")
+                
+                if max_val > 0.8:  # High confidence threshold
+                    logging.info(f"Found Cursor application on monitor {i}")
+                    return monitor
+                    
+            except Exception as e:
+                logging.warning(f"Error checking monitor {i}: {str(e)}")
+                continue
+    
+    logging.warning("Could not find Cursor application, falling back to primary monitor")
+    return sct.monitors[1]
+
+class ClickBot:
+    def __init__(self, dev_mode=False):
+        self.dev_mode = dev_mode
+        pyautogui.FAILSAFE = True
+        pyautogui.PAUSE = 0.1
+        
+        # Load target image
+        target_path = os.path.join("images", "target.png")
+        target = Image.open(target_path)
+        target = target.convert('RGB')
+        target_np = np.array(target)
+        self.target_bgr = cv2.cvtColor(target_np, cv2.COLOR_RGB2BGR)
+        
+        # Find correct monitor
+        self.monitor = find_cursor_monitor()
+        if not self.monitor:
+            raise RuntimeError("Failed to find Cursor monitor")
+            
+        logging.info(f"Using monitor: {self.monitor['width']}x{self.monitor['height']} at ({self.monitor['left']}, {self.monitor['top']})")
+        
+        # Create debug output directory
+        os.makedirs("debug_output", exist_ok=True)
+        
+        # Store target dimensions
+        self.target_h, self.target_w = self.target_bgr.shape[:2]
+        
+    def check_for_target(self):
+        """Check for target in the current screen."""
+        with mss.mss() as sct:
+            # Capture screen
+            screenshot = sct.grab(self.monitor)
+            screen_np = np.array(screenshot)
+            screen_bgr = screen_np[:, :, :3]  # Remove alpha channel
+            
+            # Perform template matching
+            result = cv2.matchTemplate(screen_bgr, self.target_bgr, cv2.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            
+            if max_val >= 0.8:  # High confidence match
+                x, y = max_loc
+                click_x = self.monitor['left'] + x + self.target_w // 2
+                click_y = self.monitor['top'] + y + self.target_h // 2
+                
+                logging.info(f"Found target with {max_val:.2%} confidence at ({click_x}, {click_y})")
+                
+                if self.dev_mode:
+                    response = input("Click target? [y/N] ")
+                    if response.lower() != 'y':
+                        return
+                
+                # Save current mouse position
+                original_x, original_y = pyautogui.position()
+                
+                try:
+                    # Move to target and click
+                    pyautogui.moveTo(click_x, click_y, duration=0.2)
+                    time.sleep(0.1)
+                    pyautogui.click()
+                    time.sleep(0.1)
+                    
+                    # Return to original position
+                    pyautogui.moveTo(original_x, original_y, duration=0.1)
+                    logging.info("Click executed successfully")
+                    
+                except Exception as e:
+                    logging.error(f"Error during click operation: {str(e)}")
+            
+            else:
+                logging.debug(f"No high confidence matches found (best: {max_val:.2%})")
+    
+    def run(self, check_interval=1.0):
+        """Run the click bot continuously."""
+        logging.info("Starting click bot...")
+        last_monitor_check = time.time()
+        
+        try:
+            while True:
+                # Check if we need to update monitor selection (every 5 minutes)
+                current_time = time.time()
+                if current_time - last_monitor_check >= 300:  # 5 minutes
+                    self.monitor = find_cursor_monitor()
+                    last_monitor_check = current_time
+                
+                self.check_for_target()
+                time.sleep(check_interval)
+                
+        except KeyboardInterrupt:
+            logging.info("Click bot stopped by user")
+        except Exception as e:
+            logging.error(f"Click bot error: {str(e)}")
 
 def main():
-    # Set up logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
-    )
-
-    # Initialize bot with 70% threshold
-    bot = ClickBot(threshold=0.7)
-    
-    # Load target image
-    target_path = os.path.join(os.path.dirname(__file__), "images", "target.png")
-    if not os.path.exists(target_path):
-        logging.error(f"Target image not found at {target_path}")
-        return
-    
-    bot.matcher.load_target(target_path)
-    logging.info("Target image loaded successfully")
+    parser = argparse.ArgumentParser(description="Cursor Click Bot")
+    parser.add_argument("--dev", action="store_true", help="Run in development mode (requires click confirmation)")
+    args = parser.parse_args()
     
     try:
-        while True:
-            # Capture current screen
-            screen = bot.capture_screen()
-            if screen is None:
-                logging.error("Failed to capture screen")
-                time.sleep(1)
-                continue
-                
-            # Find matches
-            matches = bot.matcher.find_matches(screen)
-            
-            # Generate timestamp for debug image
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            
-            if matches:
-                logging.info(f"Found {len(matches)} matches:")
-                # Sort matches by confidence
-                matches.sort(key=lambda m: m.confidence, reverse=True)
-                
-                # Save debug image with all matches
-                bot.save_debug_image(screen, matches, timestamp)
-                
-                # Process best match
-                best_match = matches[0]
-                logging.info(f"Best match:")
-                logging.info(f"  Position: ({best_match.center_x}, {best_match.center_y})")
-                logging.info(f"  Confidence: {best_match.confidence:.2f}")
-                logging.info(f"  SSIM: {best_match.quality.structural_similarity:.2f}")
-                
-                # Attempt click if confidence is high enough (70%)
-                if best_match.confidence > 0.7:
-                    if bot.smooth_click(best_match.center_x, best_match.center_y):
-                        logging.info("Successfully clicked target")
-                    else:
-                        logging.info("Click skipped (cooldown)")
-            else:
-                # Save debug image even with no matches
-                bot.save_debug_image(screen, [], timestamp)
-            
-            # Sleep to prevent excessive CPU usage
-            time.sleep(0.5)  # Reduced sleep time for better responsiveness
-            
-    except KeyboardInterrupt:
-        logging.info("Monitoring stopped by user")
+        bot = ClickBot(dev_mode=args.dev)
+        bot.run()
     except Exception as e:
-        logging.error(f"Error during monitoring: {str(e)}")
+        logging.error(f"Failed to start click bot: {str(e)}")
 
 if __name__ == "__main__":
     main() 

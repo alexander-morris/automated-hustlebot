@@ -9,6 +9,8 @@ from typing import List, Tuple, Dict
 from statistics import mean, stdev
 import shutil
 import pyautogui
+import gc
+from PIL import Image
 
 # Set up directory structure
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,27 +41,30 @@ class MatchQuality:
 
 @dataclass
 class Match:
-    x: int
-    y: int
-    width: int
-    height: int
-    confidence: float
-    method: str
-    scale: float
-    quality: MatchQuality
-    consensus_count: int = 1
-    match_region: np.ndarray = None
+    """Represents a match found in the screen image."""
+    x: int                     # Top-left x coordinate
+    y: int                     # Top-left y coordinate
+    width: int                 # Width of match region
+    height: int                # Height of match region
+    confidence: float          # Match confidence score
+    method: str               # Template matching method used
+    scale: float              # Scale factor used
+    quality: MatchQuality     # Quality metrics for the match
+    consensus_count: int = 1  # Number of matches in consensus group
+    match_region: np.ndarray = None  # The actual matched region
     
     @property
     def center_x(self) -> int:
+        """Calculate center x coordinate."""
         return self.x + self.width // 2
     
     @property
     def center_y(self) -> int:
+        """Calculate center y coordinate."""
         return self.y + self.height // 2
 
 class ImageMatcher:
-    def __init__(self, threshold=0.1):  # Lowered threshold to 0.1
+    def __init__(self, threshold=0.1):
         self.threshold = threshold
         self.screen_image = None
         self.target_image = None
@@ -67,9 +72,21 @@ class ImageMatcher:
         self.target_gray = None
         self.debug_dir = DEBUG_DIR
         
-        # Updated thresholds with lower values to catch more potential matches
+        # Cache for preprocessed images
+        self._preprocessed_cache = {}
+        
+        # Reduced scales for better performance
+        self.scales = [0.95, 1.0, 1.05]
+        
+        # Most effective matching methods
+        self.methods = [
+            (cv2.TM_CCOEFF_NORMED, "TM_CCOEFF_NORMED"),
+            (cv2.TM_CCORR_NORMED, "TM_CCORR_NORMED")
+        ]
+        
+        # Quality thresholds
         self.quality_thresholds = {
-            'confidence': 0.1,  # Lowered significantly
+            'confidence': threshold,
             'structural_similarity': 0.1,
             'edge_similarity': 0.1,
             'pixel_difference': 0.1,
@@ -77,15 +94,8 @@ class ImageMatcher:
             'consensus_count': 1
         }
         
-        # Expanded scale range for better detection
-        self.scales = [0.9, 0.95, 1.0, 1.05, 1.1]
-        
-        # Using all matching methods for comprehensive search
-        self.methods = [
-            (cv2.TM_CCOEFF_NORMED, "TM_CCOEFF_NORMED"),
-            (cv2.TM_CCORR_NORMED, "TM_CCORR_NORMED"),
-            (cv2.TM_SQDIFF_NORMED, "TM_SQDIFF_NORMED")
-        ]
+        # Initialize CLAHE for preprocessing
+        self.clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 
     def capture_screen(self):
         """Capture the current screen."""
@@ -100,93 +110,122 @@ class ImageMatcher:
         return screen_image, screen_gray
 
     def process_screen(self, screen_array: np.ndarray):
-        """Process a provided screen array."""
-        self.screen_image = screen_array
-        # Convert to grayscale
-        self.screen_gray = cv2.cvtColor(screen_array, cv2.COLOR_RGB2BGR)
-        self.screen_gray = cv2.cvtColor(self.screen_gray, cv2.COLOR_BGR2GRAY)
-        # Preprocess grayscale image
-        self.screen_gray = self.preprocess_image(self.screen_gray)
-        
-    def load_target(self, target_path: str):
-        """Load and preprocess the target image."""
-        self.target_image = cv2.imread(target_path)
-        if self.target_image is None:
-            raise ValueError(f"Failed to load target image: {target_path}")
-        
-        logging.info(f"Loaded target image {target_path}: {self.target_image.shape[:2]}")
-        
-        # Convert to grayscale
-        target_gray = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
-        # Preprocess grayscale image
-        self.target_gray = self.preprocess_image(target_gray)
-        return True
-
-    def find_matches(self, screen_array: np.ndarray = None) -> List[Match]:
-        """Find all matches of the target image in the screen image."""
-        if screen_array is not None:
-            self.process_screen(screen_array)
+        """Optimized screen processing."""
+        try:
+            logging.debug("Starting screen processing")
+            self.screen_image = screen_array
+            logging.debug(f"Screen image shape: {self.screen_image.shape}")
             
-        if self.screen_gray is None or self.target_gray is None:
-            raise ValueError("Screen and target images must be loaded first")
-
-        all_matches = []
-        timestamp = int(time.time())
-
-        for scale in self.scales:
-            # Scale target image
-            if scale != 1.0:
-                width = int(self.target_gray.shape[1] * scale)
-                height = int(self.target_gray.shape[0] * scale)
-                scaled_target = cv2.resize(self.target_gray, (width, height))
+            # Convert to grayscale efficiently
+            if len(screen_array.shape) == 3:
+                logging.debug("Converting color image to grayscale")
+                self.screen_gray = cv2.cvtColor(screen_array, cv2.COLOR_RGB2GRAY)
             else:
-                scaled_target = self.target_gray
-
-            for method, method_name in self.methods:
-                # Apply template matching
-                result = cv2.matchTemplate(self.screen_gray, scaled_target, method)
+                logging.debug("Image already in grayscale")
+                self.screen_gray = screen_array
                 
-                # Handle different method result interpretations
-                if method == cv2.TM_SQDIFF_NORMED:
-                    result = 1 - result
+            logging.debug(f"Grayscale image shape: {self.screen_gray.shape}")
+            logging.debug("Applying preprocessing...")
+            self.screen_gray = self.preprocess_image(self.screen_gray)
+            logging.debug("Screen processing complete")
+        except Exception as e:
+            logging.error(f"Error processing screen: {str(e)}")
+            import traceback
+            logging.error(traceback.format_exc())
+            raise
 
-                # Find all matches above threshold
-                locations = np.where(result >= self.threshold)
+    def load_target(self, target_path: str):
+        """Load target image to search for."""
+        try:
+            # Load target image using PIL to match raw screenshot format
+            target_img = Image.open(target_path)
+            target_img = target_img.convert('RGB')  # Ensure RGB format
+            self.target = np.array(target_img)
+            
+            # Log target image details
+            logging.info(f"Loaded target image {target_path}: {self.target.shape}")
+            self.target_height, self.target_width = self.target.shape[:2]
+            logging.info(f"Target dimensions: {self.target_width}x{self.target_height}")
+            
+            # Save normalized version for debugging
+            debug_path = os.path.join(os.path.dirname(target_path), "target-norm.png")
+            Image.fromarray(self.target).save(debug_path)
+            logging.info(f"Saved normalized target image: {debug_path}")
+            
+            return True
+        except Exception as e:
+            logging.error(f"Error loading target image: {str(e)}")
+            return False
+            
+    def find_matches(self, screen):
+        """Find all matches in the screen image."""
+        if self.target is None:
+            logging.error("Target image not loaded")
+            return []
+            
+        try:
+            # Ensure screen is in correct format
+            if isinstance(screen, Image.Image):
+                screen = np.array(screen)
+            
+            # Convert both images to BGR for OpenCV
+            if len(screen.shape) == 3 and screen.shape[2] == 3:
+                screen_bgr = cv2.cvtColor(screen, cv2.COLOR_RGB2BGR)
+            else:
+                screen_bgr = screen
                 
-                for pt in zip(*locations[::-1]):  # Switch columns and rows
-                    match_region = self.extract_match_region(
-                        pt[0], pt[1], 
-                        scaled_target.shape[1], 
-                        scaled_target.shape[0]
-                    )
+            target_bgr = cv2.cvtColor(self.target, cv2.COLOR_RGB2BGR)
+                
+            # Log shapes for debugging
+            logging.info(f"Screen shape: {screen_bgr.shape}, Target shape: {target_bgr.shape}")
+            logging.info(f"Screen dtype: {screen_bgr.dtype}, Target dtype: {target_bgr.dtype}")
+            
+            # Perform template matching
+            result = cv2.matchTemplate(screen_bgr, target_bgr, cv2.TM_CCOEFF_NORMED)
+            
+            # Get all matches above minimum threshold
+            locations = np.where(result >= 0.001)  # Very low threshold to see all potential matches
+            matches = []
+            
+            for pt in zip(*locations[::-1]):
+                x, y = pt
+                confidence = result[y, x]
+                
+                # Extract regions for quality calculation
+                screen_region = screen_bgr[y:y+target_bgr.shape[0], x:x+target_bgr.shape[1]]
+                if screen_region.shape != target_bgr.shape:
+                    continue
                     
-                    # Calculate match quality
-                    quality = self.calculate_match_quality(match_region, self.target_image)
-                    
-                    match = Match(
-                        x=pt[0],
-                        y=pt[1],
-                        width=scaled_target.shape[1],
-                        height=scaled_target.shape[0],
-                        confidence=float(result[pt[1], pt[0]]),
-                        method=method_name,
-                        scale=scale,
-                        quality=quality,
-                        match_region=match_region
-                    )
-                    
-                    all_matches.append(match)
-
-        # Find consensus among matches
-        consensus_matches = self._find_consensus_matches(all_matches)
-        
-        # Save debug visualization
-        if consensus_matches:
-            debug_path = os.path.join(self.debug_dir, f"matches_{timestamp}.png")
-            self.visualize_matches(consensus_matches, debug_path)
-            logging.info(f"Saved match visualization to {debug_path}")
-
-        return consensus_matches
+                # Calculate match quality
+                quality = self.calculate_match_quality(screen_region, target_bgr)
+                
+                # Create match object with correct parameters
+                match = Match(
+                    x=x,
+                    y=y,
+                    width=self.target_width,
+                    height=self.target_height,
+                    confidence=confidence,
+                    method="TM_CCOEFF_NORMED",
+                    scale=1.0,
+                    quality=quality
+                )
+                matches.append(match)
+                
+            logging.info(f"Found {len(matches)} potential matches with confidence >= 0.001")
+            if matches:
+                best_match = max(matches, key=lambda m: m.confidence)
+                logging.info(f"Best match confidence: {best_match.confidence:.4f}")
+                worst_match = min(matches, key=lambda m: m.confidence)
+                logging.info(f"Worst match confidence: {worst_match.confidence:.4f}")
+            
+            return matches
+            
+        except Exception as e:
+            logging.error(f"Error finding matches: {str(e)}")
+            import traceback
+            logging.error(traceback.format_exc())
+            return []
 
     def visualize_matches(self, matches: List[Match], output_path: str):
         """Create a debug image showing all matches with confidence scores."""
@@ -237,177 +276,149 @@ class ImageMatcher:
             return np.zeros((height, width, 3), dtype=np.uint8)
 
     def calculate_match_quality(self, region: np.ndarray, target: np.ndarray) -> MatchQuality:
-        """Calculate various quality metrics for a match with emphasis on text features."""
+        """Calculate quality metrics for a potential match."""
         try:
-            # Resize target to match region size if needed
-            if region.shape != target.shape:
-                target = cv2.resize(target, (region.shape[1], region.shape[0]))
-            
-            # Convert to grayscale for structural analysis
+            # Quick size check
+            if region is None or target is None:
+                return MatchQuality(0.0, 0.0, 0.0, 0.0)
+                
+            # Convert to grayscale efficiently (assuming BGR input)
             region_gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
             target_gray = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
             
-            # Apply adaptive thresholding to better handle varying lighting
-            region_binary = cv2.adaptiveThreshold(region_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                                cv2.THRESH_BINARY, 11, 2)
-            target_binary = cv2.adaptiveThreshold(target_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                                cv2.THRESH_BINARY, 11, 2)
+            # Calculate structural similarity first (fastest)
+            ssim = cv2.matchTemplate(region_gray, target_gray, cv2.TM_CCOEFF_NORMED)[0][0]
             
-            # Calculate structural similarity on binary images
-            ssim = cv2.matchTemplate(region_binary, target_binary, cv2.TM_CCOEFF_NORMED)[0][0]
+            # Early exit if SSIM is too low
+            if ssim < 0.1:
+                return MatchQuality(
+                    structural_similarity=float(ssim),
+                    pixel_difference=0.0,
+                    edge_similarity=0.0,
+                    histogram_similarity=0.0
+                )
             
-            # Enhanced edge detection with multiple thresholds
-            region_edges = cv2.Canny(region_binary, 100, 200)
-            target_edges = cv2.Canny(target_binary, 100, 200)
+            # Calculate other metrics only if SSIM is promising
+            region_edges = cv2.Canny(region_gray, 100, 200)
+            target_edges = cv2.Canny(target_gray, 100, 200)
             
-            # Calculate edge similarity using both overlap and orientation
             edge_overlap = np.sum(np.logical_and(region_edges > 0, target_edges > 0))
             edge_total = np.sum(np.logical_or(region_edges > 0, target_edges > 0))
             edge_sim = edge_overlap / (edge_total + 1e-6)
             
-            # Calculate pixel-wise difference on binary images
-            pixel_diff = 1 - (np.sum(np.abs(region_binary - target_binary)) / (region_binary.size * 255))
-            
-            # Calculate contour similarity and analyze text features
-            region_contours, _ = cv2.findContours(region_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            target_contours, _ = cv2.findContours(target_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
-            # Compare number and size of contours
-            contour_score = 0
-            if len(region_contours) > 0 and len(target_contours) > 0:
-                # Compare total area
-                region_area = sum(cv2.contourArea(c) for c in region_contours)
-                target_area = sum(cv2.contourArea(c) for c in target_contours)
-                area_ratio = min(region_area, target_area) / max(region_area, target_area)
-                
-                # Compare number of contours (characters)
-                contour_count_ratio = min(len(region_contours), len(target_contours)) / max(len(region_contours), len(target_contours))
-                
-                # Compare aspect ratios of contours
-                def get_aspect_ratios(contours):
-                    ratios = []
-                    for c in contours:
-                        x, y, w, h = cv2.boundingRect(c)
-                        if h > 0:  # Avoid division by zero
-                            ratios.append(w / h)
-                    return ratios
-                
-                region_ratios = get_aspect_ratios(region_contours)
-                target_ratios = get_aspect_ratios(target_contours)
-                
-                # Compare distribution of aspect ratios
-                if region_ratios and target_ratios:
-                    ratio_diff = abs(np.mean(region_ratios) - np.mean(target_ratios))
-                    ratio_sim = 1 / (1 + ratio_diff)
-                else:
-                    ratio_sim = 0
-                
-                # Combine contour metrics
-                contour_score = (area_ratio * 0.4 + contour_count_ratio * 0.4 + ratio_sim * 0.2)
-            
-            # Calculate histogram similarity only on the binary images
-            region_hist = cv2.calcHist([region_binary], [0], None, [2], [0, 256])
-            target_hist = cv2.calcHist([target_binary], [0], None, [2], [0, 256])
+            # Calculate histogram similarity
+            region_hist = cv2.calcHist([region_gray], [0], None, [256], [0, 256])
+            target_hist = cv2.calcHist([target_gray], [0], None, [256], [0, 256])
             cv2.normalize(region_hist, region_hist)
             cv2.normalize(target_hist, target_hist)
             hist_sim = cv2.compareHist(region_hist, target_hist, cv2.HISTCMP_CORREL)
             
-            # Weight the structural similarity more heavily and incorporate contour analysis
-            weighted_ssim = ssim * 0.5 + contour_score * 0.5
+            # Calculate pixel difference
+            pixel_diff = 1 - np.mean(np.abs(region_gray - target_gray)) / 255
             
             return MatchQuality(
-                structural_similarity=float(weighted_ssim),
+                structural_similarity=float(ssim),
                 pixel_difference=float(pixel_diff),
                 edge_similarity=float(edge_sim),
                 histogram_similarity=float(max(0, hist_sim))
             )
+            
         except Exception as e:
             logging.warning(f"Error calculating match quality: {str(e)}")
-            return MatchQuality(
-                structural_similarity=0.0,
-                pixel_difference=0.0,
-                edge_similarity=0.0,
-                histogram_similarity=0.0
-            )
-    
+            import traceback
+            logging.error(traceback.format_exc())
+            return MatchQuality(0.0, 0.0, 0.0, 0.0)
+
     def _find_consensus_matches(self, matches: List[Match], distance_threshold=20) -> List[Match]:
+        """Optimized consensus finding."""
         if not matches:
             return []
-        
-        # Group matches by proximity
-        match_groups: Dict[Tuple[int, int], List[Match]] = {}
-        
-        for match in matches:
-            matched = False
-            for center in match_groups.keys():
-                if self._is_overlapping((match.center_x, match.center_y), center, distance_threshold):
-                    match_groups[center].append(match)
-                    matched = True
-                    break
-            if not matched:
-                match_groups[(match.center_x, match.center_y)] = [match]
-        
-        # Create consensus matches
-        consensus_matches = []
-        for group in match_groups.values():
-            if len(group) < 2:  # Require at least 2 methods to agree
-                continue
             
-            try:
-                # Calculate quality score for sorting
-                def quality_score(m):
-                    return (
+        try:
+            # Convert to numpy arrays for vectorized operations
+            centers = np.array([(m.center_x, m.center_y) for m in matches])
+            
+            # Calculate pairwise distances
+            distances = np.sqrt(((centers[:, np.newaxis] - centers) ** 2).sum(axis=2))
+            
+            # Find groups efficiently
+            groups = []
+            used = set()
+            
+            for i in range(len(matches)):
+                if i in used:
+                    continue
+                    
+                # Find all matches within threshold distance
+                group_indices = np.where(distances[i] < distance_threshold)[0]
+                if len(group_indices) >= 2:  # Require at least 2 matches
+                    groups.append([matches[j] for j in group_indices])
+                    used.update(group_indices)
+            
+            # Create consensus matches
+            consensus_matches = []
+            for group in groups:
+                try:
+                    # Calculate quality score vectorized
+                    scores = np.array([
                         m.quality.structural_similarity * 0.35 +
                         m.quality.edge_similarity * 0.25 +
                         m.confidence * 0.25 +
                         m.quality.histogram_similarity * 0.15
+                        for m in group
+                    ])
+                    
+                    best_idx = np.argmax(scores)
+                    best_match = group[best_idx]
+                    
+                    # Average coordinates
+                    avg_x = int(np.mean([m.x for m in group]))
+                    avg_y = int(np.mean([m.y for m in group]))
+                    avg_scale = np.mean([m.scale for m in group])
+                    
+                    consensus_match = Match(
+                        x=avg_x,
+                        y=avg_y,
+                        width=best_match.width,
+                        height=best_match.height,
+                        confidence=best_match.confidence,
+                        method=best_match.method,
+                        scale=avg_scale,
+                        quality=best_match.quality,
+                        consensus_count=len(group),
+                        match_region=best_match.match_region
                     )
-                
-                # Use the match with highest quality as base
-                best_match = max(group, key=quality_score)
-                
-                # Average the coordinates and scale
-                avg_x = int(mean(m.x for m in group))
-                avg_y = int(mean(m.y for m in group))
-                avg_scale = mean(m.scale for m in group)
-                
-                # Create consensus match using the best match's quality metrics
-                consensus_match = Match(
-                    x=avg_x,
-                    y=avg_y,
-                    width=best_match.width,
-                    height=best_match.height,
-                    confidence=best_match.confidence,
-                    method=best_match.method,
-                    scale=avg_scale,
-                    quality=best_match.quality,
-                    consensus_count=len(group),
-                    match_region=best_match.match_region
-                )
-                consensus_matches.append(consensus_match)
-            except Exception as e:
-                logging.warning(f"Error creating consensus match: {str(e)}")
-                continue
-        
-        return sorted(consensus_matches, key=quality_score, reverse=True)
-    
-    def _is_overlapping(self, loc1: Tuple[int, int], loc2: Tuple[int, int], overlap_threshold: int) -> bool:
-        x1, y1 = loc1
-        x2, y2 = loc2
-        distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        return distance < overlap_threshold
+                    consensus_matches.append(consensus_match)
+                except Exception as e:
+                    logging.warning(f"Error creating consensus match: {str(e)}")
+                    continue
+            
+            return sorted(consensus_matches, key=lambda m: m.confidence, reverse=True)
+            
+        except Exception as e:
+            logging.error(f"Error finding consensus matches: {str(e)}")
+            return []
 
     def preprocess_image(self, image: np.ndarray) -> np.ndarray:
-        """Preprocess image for template matching."""
+        """Optimized image preprocessing with caching."""
+        # Check cache first
+        cache_key = hash(image.tobytes())
+        if cache_key in self._preprocessed_cache:
+            return self._preprocessed_cache[cache_key]
+            
         try:
             # Apply adaptive histogram equalization
-            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-            equalized = clahe.apply(image)
+            equalized = self.clahe.apply(image)
             
             # Apply Gaussian blur to reduce noise
-            blurred = cv2.GaussianBlur(equalized, (3,3), 0)
+            processed = cv2.GaussianBlur(equalized, (3,3), 0)
             
-            return blurred
+            # Cache result
+            if len(self._preprocessed_cache) > 10:  # Limit cache size
+                self._preprocessed_cache.clear()
+            self._preprocessed_cache[cache_key] = processed
+            
+            return processed
         except Exception as e:
             logging.warning(f"Error preprocessing image: {str(e)}")
             return image

@@ -1,0 +1,150 @@
+2024-12-31 09:52:48,821 - INFO - CursorWatcher initialized
+2024-12-31 09:52:48,821 - INFO - 
+=== Step 1: Finding Target Monitor ===
+2024-12-31 09:52:48,821 - INFO - Available monitors:
+2024-12-31 09:52:48,821 - INFO - 
+Analyzing Monitor 1: 0x0 1800x1169
+2024-12-31 09:52:49,019 - INFO - Saved monitor 1 screenshot: debug_images/debug_monitor_1_095248.png
+2024-12-31 09:53:15,330 - INFO - 
+Color Analysis:
+2024-12-31 09:53:15,330 - INFO -   main_bg: 10592 runs, max=1226, avg=28.9
+2024-12-31 09:53:15,330 - INFO -   secondary_bg: 24287 runs, max=1310, avg=47.4
+2024-12-31 09:53:15,330 - INFO -   dark_bg: 27693 runs, max=309, avg=5.1
+2024-12-31 09:53:15,330 - INFO -   white_text: 4762 runs, max=51, avg=3.3
+2024-12-31 09:53:15,330 - INFO -   border: 3334 runs, max=8, avg=1.2
+2024-12-31 09:53:15,354 - INFO -   Transitions found: 370
+2024-12-31 09:53:15,354 - INFO -   Total score: 132921
+2024-12-31 09:53:15,354 - INFO - 
+Analyzing Monitor 2: -806x-1080 1920x1080
+2024-12-31 09:53:15,409 - INFO - Saved monitor 2 screenshot: debug_images/debug_monitor_2_095315.png
+2024-12-31 09:53:18,771 - INFO - 
+Color Analysis:
+2024-12-31 09:53:18,771 - INFO -   main_bg: 13428 runs, max=978, avg=30.4
+2024-12-31 09:53:18,771 - INFO -   secondary_bg: 4211 runs, max=1406, avg=51.6
+2024-12-31 09:53:18,771 - INFO -   dark_bg: 4 runs, max=179, avg=173.2
+2024-12-31 09:53:18,771 - INFO -   white_text: 10002 runs, max=14, avg=1.5
+2024-12-31 09:53:18,771 - INFO -   border: 70 runs, max=2, avg=1.1
+2024-12-31 09:53:18,783 - INFO -   Transitions found: 246
+2024-12-31 09:53:18,783 - INFO -   Total score: 86997
+2024-12-31 09:53:18,783 - INFO - 
+DETAILED ANALYSIS OF EXPECTED MONITOR (Monitor 2):
+2024-12-31 09:53:18,783 - INFO - Total score: 86997
+2024-12-31 09:53:18,783 - INFO - 
+Analyzing Monitor 3: 1114x-1080 1920x1080
+2024-12-31 09:53:18,834 - INFO - Saved monitor 3 screenshot: debug_images/debug_monitor_3_095318.png
+2024-12-31 09:53:26,775 - INFO - 
+Color Analysis:
+2024-12-31 09:53:26,776 - INFO -   main_bg: 3124 runs, max=29, avg=3.3
+2024-12-31 09:53:26,776 - INFO -   secondary_bg: 8305 runs, max=15, avg=1.7
+2024-12-31 09:53:26,776 - INFO -   dark_bg: 7166 runs, max=15, avg=1.7
+2024-12-31 09:53:26,776 - INFO -   white_text: 10099 runs, max=735, avg=54.8
+2024-12-31 09:53:26,776 - INFO -   border: 638 runs, max=9, avg=1.1
+2024-12-31 09:53:26,787 - INFO -   Transitions found: 225
+2024-12-31 09:53:26,787 - INFO -   Total score: 83551
+2024-12-31 09:53:26,787 - INFO - 
+Monitor match scores (sorted by total score):
+2024-12-31 09:53:26,787 - INFO - Monitor 1: 132921 total score
+2024-12-31 09:53:26,787 - INFO - Monitor 2: 86997 total score
+2024-12-31 09:53:26,787 - INFO - Monitor 3: 83551 total score
+2024-12-31 09:53:26,787 - WARNING - 
+!!! Best match (Monitor 1) is not Monitor 2 !!!
+2024-12-31 09:53:26,787 - WARNING - Score difference too large to override
+2024-12-31 09:53:26,787 - INFO - 
+=== Step 2: Finding Composer Area ===
+2024-12-31 09:53:26,824 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:26,824 - INFO - Image dimensions: 3600x2338
+2024-12-31 09:53:26,824 - INFO - Searching region y=1558 to 2338
+2024-12-31 09:53:33,231 - INFO - 
+Color Analysis:
+2024-12-31 09:53:33,231 - INFO -   main_bg: 3297 runs, max=1226, avg=46.2, total=152188 pixels
+2024-12-31 09:53:33,231 - INFO -     Score contribution: 6794
+2024-12-31 09:53:33,231 - INFO -   secondary_bg: 12348 runs, max=1310, avg=49.1, total=606114 pixels
+2024-12-31 09:53:33,231 - INFO -     Score contribution: 24796
+2024-12-31 09:53:33,231 - INFO -   dark_bg: 7129 runs, max=282, avg=8.3, total=58990 pixels
+2024-12-31 09:53:33,231 - INFO -     Score contribution: 7411
+2024-12-31 09:53:33,231 - INFO -   white_text: 2705 runs, max=48, avg=3.5, total=9360 pixels
+2024-12-31 09:53:33,231 - INFO -     Score contribution: 13573
+2024-12-31 09:53:33,231 - INFO -   border: 841 runs, max=8, avg=2.2, total=1820 pixels
+2024-12-31 09:53:33,231 - INFO -     Score contribution: 2531
+2024-12-31 09:53:33,231 - INFO - 
+Total score: 55105
+2024-12-31 09:53:33,231 - INFO - === Found composer region: {'top': 1558, 'left': 0, 'width': 3600, 'height': 780} ===
+2024-12-31 09:53:33,232 - INFO - 
+=== Step 3: Watching for Cancel Button ===
+Looking for 'Cancel' button (white text)
+Press Ctrl+C to stop
+
+2024-12-31 09:53:33,232 - INFO - Still watching... (0s elapsed)
+2024-12-31 09:53:33,302 - INFO - Saved debug image: debug_button_region_095333.png
+2024-12-31 09:53:33,302 - INFO - Saved debug image: debug_images/debug_button_region_095333.png
+2024-12-31 09:53:33,304 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:33,304 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:33,305 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:33,305 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:33,305 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:33,305 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:33,356 - INFO - No text clusters found
+2024-12-31 09:53:33,858 - INFO - Still watching... (0s elapsed)
+2024-12-31 09:53:33,923 - INFO - Saved debug image: debug_button_region_095333.png
+2024-12-31 09:53:33,923 - INFO - Saved debug image: debug_images/debug_button_region_095333.png
+2024-12-31 09:53:33,925 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:33,925 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:33,926 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:33,926 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:33,926 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:33,926 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:33,978 - INFO - No text clusters found
+2024-12-31 09:53:34,556 - INFO - Saved debug image: debug_button_region_095334.png
+2024-12-31 09:53:34,556 - INFO - Saved debug image: debug_images/debug_button_region_095334.png
+2024-12-31 09:53:34,558 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:34,558 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:34,559 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:34,559 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:34,559 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:34,559 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:34,610 - INFO - No text clusters found
+2024-12-31 09:53:35,183 - INFO - Saved debug image: debug_button_region_095335.png
+2024-12-31 09:53:35,183 - INFO - Saved debug image: debug_images/debug_button_region_095335.png
+2024-12-31 09:53:35,184 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:35,184 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:35,185 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:35,185 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:35,185 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:35,185 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:35,236 - INFO - No text clusters found
+2024-12-31 09:53:35,814 - INFO - Saved debug image: debug_button_region_095335.png
+2024-12-31 09:53:35,814 - INFO - Saved debug image: debug_images/debug_button_region_095335.png
+2024-12-31 09:53:35,815 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:35,815 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:35,816 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:35,817 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:35,817 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:35,817 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:35,866 - INFO - No text clusters found
+2024-12-31 09:53:36,447 - INFO - Saved debug image: debug_button_region_095336.png
+2024-12-31 09:53:36,447 - INFO - Saved debug image: debug_images/debug_button_region_095336.png
+2024-12-31 09:53:36,448 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:36,448 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:36,449 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:36,449 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:36,449 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:36,449 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:36,498 - INFO - No text clusters found
+2024-12-31 09:53:37,067 - INFO - Saved debug image: debug_button_region_095337.png
+2024-12-31 09:53:37,067 - INFO - Saved debug image: debug_images/debug_button_region_095337.png
+2024-12-31 09:53:37,069 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:37,069 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:37,070 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:37,070 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:37,070 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:37,070 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:37,121 - INFO - No text clusters found
+2024-12-31 09:53:37,692 - INFO - Saved debug image: debug_button_region_095337.png
+2024-12-31 09:53:37,693 - INFO - Saved debug image: debug_images/debug_button_region_095337.png
+2024-12-31 09:53:37,694 - INFO - Converted BGRA to RGB
+2024-12-31 09:53:37,694 - INFO - Button region dimensions: 3600x780
+2024-12-31 09:53:37,695 - INFO - No clear boundary found, using default y=730
+2024-12-31 09:53:37,695 - INFO - Found text area boundary at y=730
+2024-12-31 09:53:37,695 - INFO - Searching region below y=730 (50 pixels high)
+2024-12-31 09:53:37,695 - INFO - Scanning for text clusters (window: 50x20, step: 10x5)
+2024-12-31 09:53:37,743 - INFO - No text clusters found
