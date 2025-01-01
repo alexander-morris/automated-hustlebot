@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from PIL import Image
 import numpy as np
 from error_recovery import ErrorRecoveryHandler
+import time
 
 class TestErrorRecoveryHandler(unittest.TestCase):
     def setUp(self):
@@ -37,26 +38,85 @@ class TestErrorRecoveryHandler(unittest.TestCase):
             os.rmdir(self.test_images_dir)
 
     @patch('error_recovery.ImageMatcher')
-    def test_error_detection(self, mock_matcher):
-        # Mock error icon detection
+    def test_multiple_error_detection(self, mock_matcher):
+        # Mock multiple error icon detections
+        def mock_find_all_matches(*args, **kwargs):
+            return [
+                {'confidence': 0.9, 'x': 100, 'y': 100},
+                {'confidence': 0.85, 'x': 300, 'y': 200}
+            ]
+        
+        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        
+        has_error, error_type = self.handler.check_for_errors(self.screen)
+        self.assertTrue(has_error)
+        self.assertEqual(error_type, 'multiple_error_icons')
+
+    @patch('error_recovery.ImageMatcher')
+    def test_single_error_no_trigger(self, mock_matcher):
+        # Mock single error icon detection (should not trigger recovery)
+        def mock_find_all_matches(*args, **kwargs):
+            return [{'confidence': 0.9, 'x': 100, 'y': 100}]
+        
+        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        mock_matcher.return_value.find_template.return_value = None  # No note text
+        
+        has_error, error_type = self.handler.check_for_errors(self.screen)
+        self.assertFalse(has_error)
+        self.assertIsNone(error_type)
+
+    @patch('error_recovery.ImageMatcher')
+    def test_note_text_trigger(self, mock_matcher):
+        # Mock note text detection with single error icon
+        def mock_find_all_matches(*args, **kwargs):
+            return [{'confidence': 0.9, 'x': 100, 'y': 100}]
+        
+        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
         mock_matcher.return_value.find_template.return_value = {
             'confidence': 0.9,
-            'x': 100,
-            'y': 100
+            'x': 200,
+            'y': 200
         }
         
         has_error, error_type = self.handler.check_for_errors(self.screen)
         self.assertTrue(has_error)
-        self.assertIsNotNone(error_type)
+        self.assertEqual(error_type, 'note_text')
 
     @patch('error_recovery.ImageMatcher')
-    def test_no_error_detection(self, mock_matcher):
-        # Mock no error detection
+    def test_low_confidence_matches(self, mock_matcher):
+        # Mock multiple error icons but with low confidence
+        def mock_find_all_matches(*args, **kwargs):
+            return [
+                {'confidence': 0.7, 'x': 100, 'y': 100},
+                {'confidence': 0.6, 'x': 300, 'y': 200}
+            ]
+        
+        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
         mock_matcher.return_value.find_template.return_value = None
         
         has_error, error_type = self.handler.check_for_errors(self.screen)
         self.assertFalse(has_error)
         self.assertIsNone(error_type)
+
+    @patch('error_recovery.ImageMatcher')
+    def test_overlapping_matches_filtering(self, mock_matcher):
+        # Test that overlapping matches are filtered out
+        screen = Image.new('RGB', (800, 600))
+        error_icon = Image.new('RGB', (32, 32))
+        
+        # Create two matches that overlap
+        matches = [
+            {'confidence': 0.9, 'x': 100, 'y': 100},
+            {'confidence': 0.85, 'x': 110, 'y': 105}  # Overlapping with first match
+        ]
+        
+        def mock_find_template(*args, **kwargs):
+            return matches[0]  # Return first match
+        
+        mock_matcher.return_value.find_template = mock_find_template
+        
+        result = self.handler.find_all_error_matches(screen, error_icon)
+        self.assertEqual(len(result), 1)  # Should only keep one of the overlapping matches
 
     @patch('error_recovery.ImageMatcher')
     @patch('pyautogui.click')
@@ -107,19 +167,122 @@ class TestErrorRecoveryHandler(unittest.TestCase):
 
     @patch('error_recovery.ImageMatcher')
     def test_full_error_handling_flow(self, mock_matcher):
-        # Mock error detection and recovery
-        def mock_find_template(screen, template, threshold=None):
-            if template == self.handler.error_images.get('error-icon.png'):
-                return {'confidence': 0.9, 'x': 100, 'y': 100}
-            elif template == self.handler.recovery_image:
-                return {'confidence': 0.9, 'x': 400, 'y': 500}
-            return None
+        # Mock multiple error icons and recovery
+        def mock_find_all_matches(*args, **kwargs):
+            return [
+                {'confidence': 0.9, 'x': 100, 'y': 100},
+                {'confidence': 0.85, 'x': 300, 'y': 200}
+            ]
         
-        mock_matcher.return_value.find_template.side_effect = mock_find_template
+        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        mock_matcher.return_value.find_template.return_value = {
+            'confidence': 0.9,
+            'x': 400,
+            'y': 500
+        }
         
         with patch('pyautogui.click'), patch('pyautogui.write'), patch('pyautogui.press'):
             success = self.handler.handle_error_case(self.screen)
             self.assertTrue(success)
+
+    @patch('error_recovery.ImageMatcher')
+    @patch('pyautogui.click')
+    @patch('pyautogui.write')
+    @patch('pyautogui.press')
+    def test_direct_recovery_sequence(self, mock_press, mock_write, mock_click, mock_matcher):
+        """Test the recovery sequence directly without requiring error triggers."""
+        # Mock finding the agent-buttons-footer.png
+        mock_matcher.return_value.find_template.return_value = {
+            'confidence': 0.9,
+            'x': 400,
+            'y': 500
+        }
+        
+        # Create a direct instance to test
+        handler = ErrorRecoveryHandler(debug=True)
+        
+        # Call perform_recovery directly
+        success = handler.perform_recovery(self.screen)
+        
+        # Verify the sequence of actions
+        self.assertTrue(success)
+        mock_click.assert_called_once_with(400, 470)  # Verify click 30 pixels above target
+        mock_write.assert_called_once_with('continue')  # Verify typing 'continue'
+        mock_press.assert_called_once_with('enter')  # Verify pressing enter
+        
+        # Verify the target was found with find_template
+        mock_matcher.return_value.find_template.assert_called_once()
+        args, kwargs = mock_matcher.return_value.find_template.call_args
+        self.assertEqual(kwargs.get('threshold', None), handler.error_threshold)
+
+    @patch('error_recovery.ImageMatcher')
+    @patch('pyautogui.click')
+    @patch('pyautogui.write')
+    @patch('pyautogui.press')
+    def test_recovery_sequence_with_delay(self, mock_press, mock_write, mock_click, mock_matcher):
+        """Test recovery sequence with simulated delay between actions."""
+        mock_matcher.return_value.find_template.return_value = {
+            'confidence': 0.95,
+            'x': 500,
+            'y': 600
+        }
+        
+        handler = ErrorRecoveryHandler(debug=True)
+        with patch('time.sleep') as mock_sleep:
+            success = handler.perform_recovery(self.screen)
+            
+            self.assertTrue(success)
+            mock_click.assert_called_once_with(500, 570)
+            mock_write.assert_called_once_with('continue')
+            mock_press.assert_called_once_with('enter')
+            mock_sleep.assert_called()
+
+    @patch('error_recovery.ImageMatcher')
+    @patch('pyautogui.click')
+    @patch('pyautogui.write')
+    @patch('pyautogui.press')
+    def test_recovery_sequence_with_retry(self, mock_press, mock_write, mock_click, mock_matcher):
+        """Test recovery sequence with initial failure and retry."""
+        mock_matcher.return_value.find_template.side_effect = [
+            None,  # First attempt fails
+            {'confidence': 0.9, 'x': 300, 'y': 400}  # Second attempt succeeds
+        ]
+        
+        handler = ErrorRecoveryHandler(debug=True)
+        success = handler.perform_recovery(self.screen)
+        
+        self.assertTrue(success)
+        mock_click.assert_called_once_with(300, 370)
+        mock_write.assert_called_once_with('continue')
+        mock_press.assert_called_once_with('enter')
+        self.assertEqual(mock_matcher.return_value.find_template.call_count, 2)
+
+    @patch('error_recovery.ImageMatcher')
+    @patch('pyautogui.click')
+    @patch('pyautogui.write')
+    @patch('pyautogui.press')
+    def test_recovery_sequence_edge_positions(self, mock_press, mock_write, mock_click, mock_matcher):
+        """Test recovery sequence with target near screen edges."""
+        test_positions = [
+            {'x': 0, 'y': 30},      # Left edge
+            {'x': 799, 'y': 30},    # Right edge
+            {'x': 400, 'y': 0},     # Top edge
+            {'x': 400, 'y': 599}    # Bottom edge
+        ]
+        
+        handler = ErrorRecoveryHandler(debug=True)
+        for pos in test_positions:
+            mock_matcher.return_value.find_template.return_value = {
+                'confidence': 0.9,
+                **pos
+            }
+            
+            success = handler.perform_recovery(self.screen)
+            self.assertTrue(success)
+            expected_y = max(0, pos['y'] - 30)  # Ensure y doesn't go negative
+            mock_click.assert_called_with(pos['x'], expected_y)
+            mock_write.assert_called_with('continue')
+            mock_press.assert_called_with('enter')
 
 if __name__ == '__main__':
     unittest.main() 
