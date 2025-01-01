@@ -1,10 +1,8 @@
 import os
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import patch, MagicMock
 from PIL import Image
-import numpy as np
 from error_recovery import ErrorRecoveryHandler
-import time
 
 class TestErrorRecoveryHandler(unittest.TestCase):
     def setUp(self):
@@ -40,13 +38,17 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('error_recovery.ImageMatcher')
     def test_multiple_error_detection(self, mock_matcher):
         # Mock multiple error icon detections
-        def mock_find_all_matches(*args, **kwargs):
-            return [
-                {'confidence': 0.9, 'x': 100, 'y': 100},
-                {'confidence': 0.85, 'x': 300, 'y': 200}
-            ]
+        mock_matcher.return_value.find_template.return_value = {
+            'confidence': 0.9,
+            'x': 100,
+            'y': 100
+        }
         
-        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        # Mock find_all_error_matches
+        self.handler.find_all_error_matches = MagicMock(return_value=[
+            {'confidence': 0.9, 'x': 100, 'y': 100},
+            {'confidence': 0.85, 'x': 300, 'y': 200}
+        ])
         
         has_error, error_type = self.handler.check_for_errors(self.screen)
         self.assertTrue(has_error)
@@ -55,10 +57,9 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('error_recovery.ImageMatcher')
     def test_single_error_no_trigger(self, mock_matcher):
         # Mock single error icon detection (should not trigger recovery)
-        def mock_find_all_matches(*args, **kwargs):
-            return [{'confidence': 0.9, 'x': 100, 'y': 100}]
-        
-        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        self.handler.find_all_error_matches = MagicMock(return_value=[
+            {'confidence': 0.9, 'x': 100, 'y': 100}
+        ])
         mock_matcher.return_value.find_template.return_value = None  # No note text
         
         has_error, error_type = self.handler.check_for_errors(self.screen)
@@ -68,10 +69,12 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('error_recovery.ImageMatcher')
     def test_note_text_trigger(self, mock_matcher):
         # Mock note text detection with single error icon
-        def mock_find_all_matches(*args, **kwargs):
-            return [{'confidence': 0.9, 'x': 100, 'y': 100}]
+        self.handler.find_all_error_matches = MagicMock(return_value=[
+            {'confidence': 0.9, 'x': 100, 'y': 100}
+        ])
         
-        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        # Replace the ImageMatcher instance with our mock
+        self.handler.matcher = mock_matcher.return_value
         mock_matcher.return_value.find_template.return_value = {
             'confidence': 0.9,
             'x': 200,
@@ -85,13 +88,10 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('error_recovery.ImageMatcher')
     def test_low_confidence_matches(self, mock_matcher):
         # Mock multiple error icons but with low confidence
-        def mock_find_all_matches(*args, **kwargs):
-            return [
-                {'confidence': 0.7, 'x': 100, 'y': 100},
-                {'confidence': 0.6, 'x': 300, 'y': 200}
-            ]
-        
-        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
+        self.handler.find_all_error_matches = MagicMock(return_value=[
+            {'confidence': 0.7, 'x': 100, 'y': 100},
+            {'confidence': 0.6, 'x': 300, 'y': 200}
+        ])
         mock_matcher.return_value.find_template.return_value = None
         
         has_error, error_type = self.handler.check_for_errors(self.screen)
@@ -124,11 +124,17 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('pyautogui.press')
     def test_recovery_sequence(self, mock_press, mock_write, mock_click, mock_matcher):
         # Mock footer detection
-        mock_matcher.return_value.find_template.return_value = {
+        mock_matcher.return_value.find_template = MagicMock(return_value={
             'confidence': 0.9,
             'x': 400,
             'y': 500
-        }
+        })
+        
+        # Replace the ImageMatcher instance with our mock
+        self.handler.matcher = mock_matcher.return_value
+        
+        # Mock image loading
+        self.handler.recovery_image = self.footer
         
         success = self.handler.perform_recovery(self.screen)
         
@@ -168,18 +174,19 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('error_recovery.ImageMatcher')
     def test_full_error_handling_flow(self, mock_matcher):
         # Mock multiple error icons and recovery
-        def mock_find_all_matches(*args, **kwargs):
-            return [
-                {'confidence': 0.9, 'x': 100, 'y': 100},
-                {'confidence': 0.85, 'x': 300, 'y': 200}
-            ]
+        self.handler.find_all_error_matches = MagicMock(return_value=[
+            {'confidence': 0.9, 'x': 100, 'y': 100},
+            {'confidence': 0.85, 'x': 300, 'y': 200}
+        ])
         
-        mock_matcher.return_value.find_all_error_matches = mock_find_all_matches
-        mock_matcher.return_value.find_template.return_value = {
+        mock_matcher.return_value.find_template = MagicMock(return_value={
             'confidence': 0.9,
             'x': 400,
             'y': 500
-        }
+        })
+        
+        # Mock image loading
+        self.handler.recovery_image = self.footer
         
         with patch('pyautogui.click'), patch('pyautogui.write'), patch('pyautogui.press'):
             success = self.handler.handle_error_case(self.screen)
@@ -192,17 +199,20 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     def test_direct_recovery_sequence(self, mock_press, mock_write, mock_click, mock_matcher):
         """Test the recovery sequence directly without requiring error triggers."""
         # Mock finding the agent-buttons-footer.png
-        mock_matcher.return_value.find_template.return_value = {
+        mock_matcher.return_value.find_template = MagicMock(return_value={
             'confidence': 0.9,
             'x': 400,
             'y': 500
-        }
+        })
         
-        # Create a direct instance to test
-        handler = ErrorRecoveryHandler(debug=True)
+        # Replace the ImageMatcher instance with our mock
+        self.handler.matcher = mock_matcher.return_value
+        
+        # Mock image loading
+        self.handler.recovery_image = self.footer
         
         # Call perform_recovery directly
-        success = handler.perform_recovery(self.screen)
+        success = self.handler.perform_recovery(self.screen)
         
         # Verify the sequence of actions
         self.assertTrue(success)
@@ -213,7 +223,7 @@ class TestErrorRecoveryHandler(unittest.TestCase):
         # Verify the target was found with find_template
         mock_matcher.return_value.find_template.assert_called_once()
         args, kwargs = mock_matcher.return_value.find_template.call_args
-        self.assertEqual(kwargs.get('threshold', None), handler.error_threshold)
+        self.assertEqual(kwargs.get('threshold', None), self.handler.error_threshold)
 
     @patch('error_recovery.ImageMatcher')
     @patch('pyautogui.click')
@@ -221,11 +231,14 @@ class TestErrorRecoveryHandler(unittest.TestCase):
     @patch('pyautogui.press')
     def test_recovery_sequence_with_delay(self, mock_press, mock_write, mock_click, mock_matcher):
         """Test recovery sequence with simulated delay between actions."""
-        mock_matcher.return_value.find_template.return_value = {
+        mock_matcher.return_value.find_template = MagicMock(return_value={
             'confidence': 0.95,
             'x': 500,
             'y': 600
-        }
+        })
+        
+        # Mock image loading
+        self.handler.recovery_image = self.footer
         
         handler = ErrorRecoveryHandler(debug=True)
         with patch('time.sleep') as mock_sleep:
@@ -247,6 +260,9 @@ class TestErrorRecoveryHandler(unittest.TestCase):
             None,  # First attempt fails
             {'confidence': 0.9, 'x': 300, 'y': 400}  # Second attempt succeeds
         ]
+        
+        # Mock image loading
+        self.handler.recovery_image = self.footer
         
         handler = ErrorRecoveryHandler(debug=True)
         success = handler.perform_recovery(self.screen)
@@ -270,12 +286,15 @@ class TestErrorRecoveryHandler(unittest.TestCase):
             {'x': 400, 'y': 599}    # Bottom edge
         ]
         
+        # Mock image loading
+        self.handler.recovery_image = self.footer
+        
         handler = ErrorRecoveryHandler(debug=True)
         for pos in test_positions:
-            mock_matcher.return_value.find_template.return_value = {
+            mock_matcher.return_value.find_template = MagicMock(return_value={
                 'confidence': 0.9,
                 **pos
-            }
+            })
             
             success = handler.perform_recovery(self.screen)
             self.assertTrue(success)
