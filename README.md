@@ -1,18 +1,26 @@
-# Full-Stack Development Automation Project
+# HustleBot III
 
-This project demonstrates automated development workflows using Cursor/Claude, featuring a React frontend and Express backend with continuous testing and monitoring.
+Empowering developers to maximize their potential by combining hacking ingenuity, hustle mindset, and AI automation.
 
-## Project Structure 
-This is a monorepo with a frontend and backend.
+## Vision
+HustleBot represents the intersection of hacker creativity, hustle culture's drive for efficiency, and AI's transformative power. It's designed for developers who understand that working smarter means leveraging every available tool and automation to stay ahead in today's fast-paced tech landscape.
 
-## How to use this repo
+## Features
+- Intelligent screen monitoring and pattern recognition
+- Automated response handling with high precision
+- Smart window detection across multiple monitors
+- Configurable actions with development mode for testing
+- Real-time confidence scoring and match visualization
 
-1. Fill out the product scope in the knowledgebase/your-product-scope.md file.
-2. Run the composer.sh script to start the development process.
-3. The composer will create a new branch, make changes, and merge the changes into the main branch.
-4. The composer will also run the tests and monitor the changes.
-5. The composer will create a pull request and merge the changes into the main branch.
-6. The composer will also create a new release and deploy the changes to the production environment.
+## Philosophy
+This project embodies the modern developer's approach to productivity:
+- **Hacker Mindset**: Finding creative solutions to automate repetitive tasks
+- **Hustle Culture**: Maximizing efficiency to stay ahead of the competition
+- **AI Integration**: Leveraging machine learning for smarter automation
 
-This is a template for a monorepo with a react frontend and express backend, targetting deployments to vercel, but you can easily change the deployment target to any other platform. Just be sure to include it in your knowledgebase folder and tell composer to pay attention to it. 
+## Getting Started
+The bot is designed to be both powerful and user-friendly, with development mode for safe testing and a production mode for seamless automation.
+
+## Contributing
+This project is open to contributions from developers who share our vision of combining technical excellence with productivity optimization.
 

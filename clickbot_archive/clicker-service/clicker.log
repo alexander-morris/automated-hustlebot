@@ -1,0 +1,4 @@
+2024-12-31 07:42:27,321 - INFO - Starting Simple Clicker
+2024-12-31 07:42:27,321 - ERROR - Error: PyAutoGUI was unable to import pyscreeze. (This is likely because you're running a version of Python that Pillow (which pyscreeze depends on) doesn't support currently.) Please install this module to enable the function you tried to call.
+2024-12-31 07:43:15,030 - INFO - Starting Simple Clicker
+2024-12-31 07:43:15,030 - ERROR - Error: PyAutoGUI was unable to import pyscreeze. (This is likely because you're running a version of Python that Pillow (which pyscreeze depends on) doesn't support currently.) Please install this module to enable the function you tried to call.

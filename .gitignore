@@ -1,21 +1,35 @@
-# dependencies
-node_modules/
+# Debug outputs
+clickbot/debug_output/
+**/debug_output/
+**/screenshots/
 
-# testing
-coverage/
-
-# production
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# logs
-logs/
-*.log
-
-# environment variables
+# Virtual Environment
+venv/
+ENV/
 .env
-.env.local
-.env.*.local
 
 # IDE
 .idea/
@@ -23,6 +37,11 @@ logs/
 *.swp
 *.swo
 
-# misc
+# OS
 .DS_Store
-.vercel 
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 
